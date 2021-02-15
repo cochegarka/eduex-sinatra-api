@@ -8,7 +8,7 @@ require 'json'
 set :port, ENV['PORT']
 
 set :allow_origin, ENV['SPA_URL']
-set :allow_methods, "GET,HEAD,POST,UPDATE,DELETE,OPTION"
+set :allow_methods, "GET,HEAD,POST,UPDATE,DELETE,OPTION,PUT"
 set :allow_headers, "accept,content-type,if-modified-since"
 set :expose_headers, "location,link"
 
@@ -119,10 +119,10 @@ post "/create" do
     speciality_id = data['speciality_id']
 
     pay_start = data['pay']['start']
-    pay_start = if pay_start.empty? then 'NULL' else pay_start end 
+    pay_start = if "#{pay_start}".empty? then 'NULL' else pay_start end 
 
     pay_end = data['pay']['end']
-    pay_end = if pay_end.empty? then 'NULL' else pay_end end 
+    pay_end = if "#{pay_end}".empty? then 'NULL' else pay_end end 
 
     client.query("INSERT INTO teacher VALUES (DEFAULT, '#{client.escape(data['full_name'])}', '#{client.escape(data['short_name'])}', '#{data['date_of_birth']}', '#{client.escape(data['about'])}', '#{data['career_start']}', '#{data['phone_number']}', '#{data['email']}', '#{data['telegram']}')")
     teacher_id = client.last_id
@@ -146,6 +146,12 @@ put "/update/:id" do
 
     data = payload
     vacancy_id = Integer(params['id'])
+
+    pay_start = data['pay']['start']
+    pay_start = if "#{pay_start}".empty? then 'NULL' else pay_start end 
+
+    pay_end = data['pay']['end']
+    pay_end = if "#{pay_end}".empty? then 'NULL' else pay_end end 
 
     client.query("UPDATE teacher SET full_name='#{client.escape(data['full_name'])}', short_name='#{client.escape(data['short_name'])}', date_of_birth='#{data['date_of_birth']}', about='#{client.escape(data['about'])}', career_start='#{data['career_start']}', phone_number='#{data['phone_number']}', email='#{data['email']}', telegram='#{data['telegram']}' WHERE teacher_id=#{data['teacher_id']}")
     client.query("UPDATE vacancy SET fork_start=#{pay_start}, fork_end=#{pay_end}, title='#{client.escape(data['title'])}', description='#{client.escape(data['description'])}', speciality_speciality_id=#{data['speciality_id']} WHERE vacancy_id=#{vacancy_id}")
